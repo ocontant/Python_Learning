@@ -40,6 +40,7 @@ def print_board(playboard):
     for row in playboard:
         print " ".join(row)
 
+
 def random_row(board):
     """
     :param board: Type: list; Take multi dimension list variable gameboard
@@ -47,12 +48,14 @@ def random_row(board):
     """
     return randint(0, len(board) - 1)
 
+
 def random_col(board):
     """
     :param board: Type: list; Take multi dimension list variable gameboard
     :return: A random column in the gameboard
     """
     return randint(0, len(board[0]) - 1)
+
 
 def create_boat():
     """
@@ -73,22 +76,9 @@ def create_boat():
                                    '5: Submarine (size 1)\n\n'
                                    "Ship %s\n"
                                    'Choose one of the following options:' % (errormsg, (i + 1))))
-            if answer > 5 or answer < 1:
+            if answer > 5 or answer < 1 or answer == None:
                 errormsg = "\n\nERROR: Invalid Option: value %s is not a valid ship!\n" % answer
 
-        # Validate that raw_input answer is in valid range
-        # while answer > 5 or answer < 1:
-        #     print "\n\nERROR: Invalid Option: value %s is not a valid boat!\n" % answer
-        #     answer = None
-        #     answer = int(raw_input("\n\n\n\n\n1: Aircraft Carrier (size 5)\n"
-        #                        "2: Battle Cruise (size: 4)\n"
-        #                        "3: Battle Ship (size 3)\n"
-        #                        "4: Support Ship (size 2)\n"
-        #                        "5: Submarine (size 1)\n\n"
-        #                        "Ship %s\n"
-        #                        "Choose one of the following options:" % (i + 1)))
-
-        # Add value to boat_type list
         boat_type.append(answer)
     return boat_type
 
@@ -165,24 +155,28 @@ def hide_ships(board, ships):
                 coordinate_ship = get_ship_coordinate(orientation, start_pos, ship_infos) # Get each pair of coordinate (x,y) to compare with other coordinate of other ship to detect if we are superposing ship
 
                 juxtaposing = 1
-                if len(hidden_ship) > 0:
-                    for boat in hidden_ship:                        # Loop all ship hidden so far
+                if len(hidden_ships) > 0:
+                    for boat in hidden_ships:                       # Loop all ship hidden so far
                         for boat_coord in boat[0]:                  # Loop all coordinate for the current hidden ship
                             for ship_coord in coordinate_ship:      # Loop all coordinate for the new ship to hide
                                 if ship_coord == boat_coord:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
                                     juxtaposing = 0
+                                print "juxtaposing value:", juxtaposing
                     if juxtaposing:
                         break
                 else:
                     break
 
 
-                break
-
-
 
         hidden_ships.append([coordinate_ship, ship_infos])
         print "Ship %s of type %s has been hidden" % (ship, ship_infos[0])
+
+        #Debug
+        for boardcoord in coordinate_ship:
+            x = boardcoord[0]
+            y = boardcoord[1]
+            board[x][y] = 'S'
 
     # Debug
     print "DEBUG: hidden_ships", hidden_ships
@@ -193,22 +187,38 @@ def hide_ships(board, ships):
 def guess_position():
     print "Not coded yet"
 
-def is_ship_there():
+
+def is_ship_there(coordinate, hidden_ships):  # Must check all hidden_ships coordinate and check if HIT.  If HIT, must update gameboard and check if ship is sunk and if all ship are sunk
+    juxtaposing = 1
+    if len(hidden_ships) > 0:
+        for boat in hidden_ships:                       # Loop all ship hidden so far
+            for boat_coord in boat[0]:                  # Loop all coordinate for the current hidden ship
+                for ship_coord in coordinate_ship:      # Loop all coordinate for the new ship to hide
+                    if ship_coord == boat_coord:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
+                        juxtaposing = 0
+                    print "juxtaposing value:", juxtaposing
+    if juxtaposing:
     print "Not coded yet"
+    return None
+
 
 def is_ship_sunk():
     print "Not coded yet"
+
 
 def is_all_ship_sunk():
     print "Not coded yet"
 
 
 
+#### MAIN SECTION ####
 
 board = create_board()
 ships = create_boat()
 hidden_ships = hide_ships(board, ships)
 
+
+#### DEBUG SECTION ####
 
 #Debug
 print "DEBUG:\n\n\n"
