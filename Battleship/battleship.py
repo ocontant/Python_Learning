@@ -110,10 +110,20 @@ def get_boat_type(type_boat):
         return ['Submarine (size 1)', 1]
 
 
-def hidden_ship_coordinate(hidden_ship):
-    for ship in hidden_ship:
-
-        return range(ship[1], ship[2][1])
+def get_ship_coordinate(orientation, start_pos, ship_infos):
+    """
+    :param orientation:
+    :param start_pos:
+    :param ship_infos:
+    :return:
+    """
+    ship_coordinate = []
+    for size in range(ship_infos[1]):
+        if orientation:  # 1 = true, 0 = false
+            ship_coordinate.append([start_pos[0], (start_pos[orientation] + size)])
+        else:
+            ship_coordinate.append([(start_pos[orientation] + size), start_pos[1]])
+    return ship_coordinate
 
 
 def hide_ships(board, ships):
@@ -132,11 +142,13 @@ def hide_ships(board, ships):
         ship_infos = get_boat_type(ship)
 
         # Debug
-        print "DEBUG: %s: %s" % (ship_infos[0], ship_infos[1])
+        print "DEBUG: ship_infos[0]:%s, ship_infos[1]: %s" % (ship_infos[0], ship_infos[1])
 
         # Find a spot big enough to hide ship
 
         while True: # Exit the loop if start and end position are inside the limit of the board
+            orientation = None
+            start_pos = []
 
             # Decide which orientation to use to hide the ship. 0=horizontal, 1=vertical
             orientation = getrandbits(1)
@@ -148,23 +160,35 @@ def hide_ships(board, ships):
             print "DEBUG: Start Posiion col: %s" % start_pos[1]
             print "DEBUG: Orientation: %s" % orientation
 
-            if orientation == 0:
-                if ((start_pos[0] + ship_infos[1]) < len(board)) and (start_pos[1] < len(board)):  # Exit the loop if start and end position are inside the limit of the board
+            if ((start_pos[orientation] + ship_infos[1]) < len(board)):  # Exit the loop if start and end position are inside the limit of the board
+
+                coordinate_ship = get_ship_coordinate(orientation, start_pos, ship_infos) # Get each pair of coordinate (x,y) to compare with other coordinate of other ship to detect if we are superposing ship
+
+                juxtaposing = 1
+                if len(hidden_ship) > 0:
+                    for boat in hidden_ship:                        # Loop all ship hidden so far
+                        for boat_coord in boat[0]:                  # Loop all coordinate for the current hidden ship
+                            for ship_coord in coordinate_ship:      # Loop all coordinate for the new ship to hide
+                                if ship_coord == boat_coord:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
+                                    juxtaposing = 0
+                    if juxtaposing:
+                        break
+                else:
                     break
-            elif orientation == 1:
-                if ((start_pos[1] + ship_infos[1]) < len(board)) and (start_pos[0] < len(board)):  # Exit the loop if start and end position are inside the limit of the board
-                    break
-            else:
-                print "ERROR: Value of orientation is set to something else than 0 or 1. Value: %s" % orientation
 
 
-        hidden_ships.append([orientation, start_pos, ship_infos])
+                break
+
+
+
+        hidden_ships.append([coordinate_ship, ship_infos])
         print "Ship %s of type %s has been hidden" % (ship, ship_infos[0])
 
     # Debug
-    print "DEBUG:", hidden_ships
+    print "DEBUG: hidden_ships", hidden_ships
 
     return hidden_ships
+
 
 def guess_position():
     print "Not coded yet"
@@ -199,18 +223,15 @@ for ship in ships:
 
 
 for j in range(len(hidden_ships)):
-    # print "hidden_ships[j][0]:", hidden_ships[j][0]
-    # print "hidden_ships[j][1]", hidden_ships[j][1]
-    # print 'hidden_ships[j][2][0]', hidden_ships[j][2][0]
-    # print 'hidden_ships[j][2][1])', hidden_ships[j][2][1]
-    # print 'hidden_ships[j][1] + hidden_ships[j][2][1]', hidden_ships[j][1] + hidden_ships[j][2][1]
+    print "j", j
+    print 'hidden_ships[j][0]', hidden_ships[j][0]
+    print 'hidden_ships[j][2][0]', hidden_ships[j][1][0]
+    print 'hidden_ships[j][2][1])', hidden_ships[j][1][1]
 
-    print "\n\n%s:\n " \
-          "orientation: %s\n" \
-          "start: %s\n" \
-          "end: %s\n" \
+    print "\n\n%s:\n" \
+          "Set of coordinates: %s\n"\
           "Ship Type: %s\n" \
-          "Ship Size: %s\n" % (j, hidden_ships[j][0], hidden_ships[j][1], hidden_ships[j][1] + hidden_ships[j][2][1], hidden_ships[j][2][0], hidden_ships[j][2][1])
+          "Ship Size: %s\n" % (j, hidden_ships[j][0], hidden_ships[j][1][0], hidden_ships[j][1][1])
 
 
 
