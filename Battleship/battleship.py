@@ -204,8 +204,8 @@ def guess_position():
     :return: User guess coordinate
     """
     guess_pos = []
-    guess_pos.append(int(raw_input("Guess Row:")))
-    guess_pos.append(int(raw_input("Guess Col:")))
+    guess_pos.append(int(raw_input("Guess Row:"))-1)
+    guess_pos.append(int(raw_input("Guess Col:"))-1)
 
     return guess_pos
 
@@ -232,16 +232,14 @@ def is_ship_hit(coordinate, hidden_ships):
     hit = 0
 
     for ship in hidden_ships:                       # Loop all ship hidden so far
+        print "DEBUG is_ship_hit: ship", ship
+        print "DEBUG is_ship_hit: ship[0]", ship[0]
         for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
-            for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
-                if ship_coord == coordinate:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
-                    hit = 1
-                    break
-                print "DEBUG is_ship_hit: ship",ship
-				print "DEBUG is_ship_hit: ship[0]",ship[0]
-                print "DEBUG is_ship_hit: ship_coords",ship_coords
-                print "DEBUG is_ship_hit: ship_coord",ship_coord
-                print "DEBUG is_ship_hit: coordinate",coordinate
+            print "DEBUG is_ship_hit: ship_coords", ship_coords
+            if ship_coords == coordinate:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
+                hit = 1
+                break
+            print "DEBUG is_ship_hit: coordinate", coordinate
 
     if not hit: # 1 = true, 0 = false
         return 0
@@ -257,20 +255,24 @@ def is_ship_sunk(gameboard, ship):
     """
     counter = 0
     for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
-        for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
-            if gameboard[ship_coord[0], ship_coord[1]] == 'S':
-                counter += 1
-    if counter == len(ship_coords):
+        if gameboard[ship_coords[0]][ship_coords[1]] == 'S':
+            counter += 1
+
+    if counter == len(ship[0]):
         return 1
     else:
         return 0
 
 
 def is_all_ship_sunk(gameboard, hidden_ships):
+    """
+    :param gameboard: List of list defining the gameboard
+    :param hidden_ships: [Coordinate[int(x),int(y)], ship_infos[str(desc),int(type_boat)]]
+    :return:
+    """
     for ship in hidden_ships:                       # Loop all ship hidden so far
         for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
-            for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
-                if gameboard[ship_coord[0], ship_coord[1]] == 'O':
+                if gameboard[ship_coords[0]][ship_coords[1]] == 'O':
                     return 0                         # Will exit at the moment a coordinate == 'O' for ocean where a ship coordiante is.
     return 1                                         # Will execute only if no ship coordinate == 'O'
 
@@ -300,16 +302,18 @@ while i < 10:
             print_board(gameboard)
             print "You missed!"
             i += 1
-        else:
-            if is_ship_sunk(shiphit):
-                if is_all_ship_sunk(gameboard, hidden_ships):
+        else:                                                       # Ship has been hit, update gameboard
+            gameboard = update_board(gameboard, guess_pos,'S')
+            print_board(gameboard)
+
+            if is_ship_sunk(gameboard, shiphit):                    # Ship might have been sunk by last hit.
+                if is_all_ship_sunk(gameboard, hidden_ships):       # Ship has been sunk, maybe all ship are sunk by now.
                     print "Congratulation! You sunk all ship!!!"
                     break
                 print "You hit a ship and sunk it!"
             else:
-                gameboard = update_board(gameboard, guess_pos,'S')
-                print_board(gameboard)
                 print "You hit a ship!!!\n"
+
 
 
 
