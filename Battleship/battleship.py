@@ -237,10 +237,11 @@ def is_ship_hit(coordinate, hidden_ships):
                 if ship_coord == coordinate:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
                     hit = 1
                     break
-                print "ship",ship
-                print "ship_coords",ship_coords
-                print "ship_coord",ship_coord
-                print "coordinate",coordinate
+                print "DEBUG is_ship_hit: ship",ship
+				print "DEBUG is_ship_hit: ship[0]",ship[0]
+                print "DEBUG is_ship_hit: ship_coords",ship_coords
+                print "DEBUG is_ship_hit: ship_coord",ship_coord
+                print "DEBUG is_ship_hit: coordinate",coordinate
 
     if not hit: # 1 = true, 0 = false
         return 0
