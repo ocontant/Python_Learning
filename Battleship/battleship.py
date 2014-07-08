@@ -206,7 +206,20 @@ def guess_position():
 
     return guess_pos
 
-def find_ship(coordinate, hidden_ships):
+
+def is_coordinate_attacked(gameboard, coordinate):
+    """
+    :param gameboard: List of list defining the gameboard
+    :param coordinate: [int(x),int(y)]
+    :return: True or False
+    """
+    if not gameboard[coordinate[0],coordinate[1]] == 'O'
+        return 1
+    else:
+        return 0
+
+
+def is_ship_hit(coordinate, hidden_ships):
     """
     # Must check all hidden_ships coordinate and check if HIT.  If HIT, must update gameboard and check if ship is sunk and if all ship are sunk
     :param coordinate: X,Y coordinate to check
@@ -219,49 +232,39 @@ def find_ship(coordinate, hidden_ships):
         for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
             for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
                 if ship_coord == coordinate:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
-                    hit_ship = ship
+                    hit = 1
+                    break
+
     if not hit: # 1 = true, 0 = false
         return 0
     else:
         return ship
 
 
-def is_ship_hit(coordinate, hidden_ships):
+def is_ship_sunk(gameboard, ship):
     """
-    # Must check all hidden_ships coordinate and check if HIT.  If HIT, must update gameboard and check if ship is sunk and if all ship are sunk
-    :param coordinate: X,Y coordinate to check
-    :param hidden_ships: [Coordinate[int(x),int(y)], ship_infos[str(desc),int(type_boat)]]
+    :param gameboard: List of list defining the gameboard
+    :param ship: [[coordinates: [x,y]], [ship_infos: str(desc), int(type)]
     :return:
     """
-    juxtaposing = 0
+    counter = 0
+        for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
+            for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
+                if gameboard[ship_coord[0], ship_coord[1]] == 'S':
+                    counter += 1
+        if counter == len(ship_coords)
+            return 1
+        else
+            return 0
 
+
+def is_all_ship_sunk(gameboard, hidden_ships):
     for ship in hidden_ships:                       # Loop all ship hidden so far
         for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
             for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
-                if ship_coord == coordinate:        # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
-                    juxtaposing = 1
-    if juxtaposing: # 1 = true, 0 = false
-        return ship
-    else:
-        return 0
-
-
-def is_ship_sunk(coordinate, hidden_ships):
-    for ship in hidden_ships:                        # Loop all ship hidden so far
-        for ship_coords in ship[0]:                  # Loop all coordinate for the current hidden ship
-            for ship_coord in ship_coords:           # Loop all coordinate for the new ship to hide
-                if ship_coord == coordinate:         # Compare coordinate of the new ship to hide with the coordinate of all already hidden ship
-                    sunk_ship = ship
-
-    print "s_ship_sunk() is not coded yet"
-    return 0
-    for
-
-
-def is_all_ship_sunk():
-    print "is_all_ship_sunk() Not coded yet"
-    return 0
-
+                if gameboard[ship_coord[0], ship_coord[1]] == 'O':
+                    return 0                         # Will exit at the moment a coordinate == 'O' for ocean where a ship coordiante is.
+    return 1                                         # Will execute only if no ship coordinate == 'O'
 
 
 #### MAIN SECTION ####
@@ -275,20 +278,27 @@ hidden_ships = hide_ships(gameboard, ships)
 while i < 10:
     guess_pos = []
     guess_pos = guess_position()
-    if is_ship_hit(guess_pos, hidden_ships):
-        if is_ship_sunk():
-            if is_all_ship_sunk()
-                print "Congratulation! You sunk all ship!!!"
-                break
-            print "You hit a ship and sunk it!"
-        else:
-            gameboard = update_board(gameboard, guess_pos,'S')
-            print_board(gameboard)
-            print "You hit a ship!!!\n"
+
+    if is_coordinate_attacked(gameboard,guess_pos):
+        print "Target already attacked previously!  Find another coordinate to attack!"
     else:
-        gameboard = update_board(gameboard, guess_row, 'X')
-        print_board(gameboard)
-        print "You missed!"
+        shiphit = is_ship_hit(guess_pos, hidden_ships)
+
+        if not shiphit:                                             # If guess_pos doesn't hit a ship, display X at coordinate on board, Else ship is hit and display S on board and validate if ship is sunk.
+            gameboard = update_board(gameboard, guess_row, 'X')
+            print_board(gameboard)
+            print "You missed!"
+            i += 1
+        else:
+            if is_ship_sunk(shiphit):
+                if is_all_ship_sunk(gameboard, hidden_ships)
+                    print "Congratulation! You sunk all ship!!!"
+                    break
+                print "You hit a ship and sunk it!"
+            else:
+                gameboard = update_board(gameboard, guess_pos,'S')
+                print_board(gameboard)
+                print "You hit a ship!!!\n"
 
 
 
