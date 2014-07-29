@@ -199,13 +199,16 @@ def hide_ships(board, ships):
     return hidden_ships
 
 
-def guess_position():
+def guess_position(gameboard):
     """
     :return: User guess coordinate
     """
-    guess_pos = []
-    guess_pos.append(int(raw_input("Guess Row:"))-1)
-    guess_pos.append(int(raw_input("Guess Col:"))-1)
+    guess_pos = [0,0]
+
+    while guess_pos[0] > len(gameboard) or guess_pos[1] > len(gameboard):
+        guess_pos = []
+        guess_pos.append(int(raw_input("Guess Row:"))-1)
+        guess_pos.append(int(raw_input("Guess Col:"))-1)
 
     return guess_pos
 
